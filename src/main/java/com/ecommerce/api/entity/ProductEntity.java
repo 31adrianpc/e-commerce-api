@@ -3,13 +3,16 @@ package com.ecommerce.api.entity;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,19 +38,26 @@ public class ProductEntity {
     @Column(name = "price", precision = 2, nullable = false)
     private BigDecimal price;
 
+    @Builder.Default
+    @Column(name = "stock_quantity", nullable = false)
+    private Integer stock = 0;
+
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
-    @OneToOne
-    @JoinColumn(name = "category_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
+    @Builder.Default
     @Column(name = "is_active")
-    private Boolean isActive;
+    private boolean isActive = true;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private Timestamp creationTime;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private Timestamp updateTime;
 }

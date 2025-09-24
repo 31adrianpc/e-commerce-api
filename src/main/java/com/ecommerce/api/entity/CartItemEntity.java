@@ -28,6 +28,10 @@ public class CartItemEntity {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private CartEntity carro;
+
+    @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity product;
 
