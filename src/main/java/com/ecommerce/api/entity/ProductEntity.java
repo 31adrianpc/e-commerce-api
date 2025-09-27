@@ -20,7 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "products")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,10 +32,13 @@ public class ProductEntity {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "name", length = 200, nullable = false)
+    private String name;
+
     @Column(name = "description")
     private String description;
 
-    @Column(name = "price", precision = 2, nullable = false)
+    @Column(name = "price", precision = 10, scale = 2, nullable = false)
     private BigDecimal price;
 
     @Builder.Default
@@ -46,7 +49,7 @@ public class ProductEntity {
     private String imageUrl;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
 
     @Builder.Default

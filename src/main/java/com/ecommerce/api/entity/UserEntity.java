@@ -51,9 +51,10 @@ public class UserEntity {
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private USER_ROLE role;
+    private USER_ROLE role = USER_ROLE.CUSTOMER;
 
     @Builder.Default
     @Column(name = "is_active")
