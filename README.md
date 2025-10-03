@@ -52,9 +52,9 @@ API REST para sistema de e-commerce desarrollada con Java 17 y Spring Boot 3.5.4
 - ✅ Estructura de base de datos (DDL.sql)
 - ✅ Entidades con relaciones JPA
 - ✅ Configuración de MySQL y JPA
+- ✅ Repositories con Spring Data JPA
 
 ### 🚧 En Desarrollo
-- 🚧 Repositories con Spring Data JPA
 - 🚧 Services con lógica de negocio
 - 🚧 REST Controllers
 - 🚧 Seguridad JWT
