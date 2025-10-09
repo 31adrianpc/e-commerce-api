@@ -16,10 +16,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>{
     boolean existsByEmail(String email);
 
     // Para el login
-    Optional<UserEntity> findByUsernameAndIsActive(String username, boolean isActive);
-    Optional<UserEntity> findByEmailAndIsActive(String email,  boolean isActive);
+    Optional<UserEntity> findByUsernameAndActive(String username, boolean active);
+    Optional<UserEntity> findByEmailAndActive(String email,  boolean active);
 
     // Gestión de usuarios
-    List<UserEntity> findByRoleAndIsActive(USER_ROLE role, boolean isActive);
-    List<UserEntity> findByIsActive(boolean isActive);
+    List<UserEntity> findByRoleAndActive(USER_ROLE role, boolean active);
+    List<UserEntity> findByActive(boolean active);
 }

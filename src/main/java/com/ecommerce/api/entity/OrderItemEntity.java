@@ -55,6 +55,6 @@ public class OrderItemEntity {
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private Timestamp creationTime;
+    private Timestamp createdAt;
 
 }

@@ -18,12 +18,12 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     Optional<ProductEntity> findByName(String name);
 
     //Gestión
-    List<ProductEntity> findByIsActive(boolean isActive);
+    List<ProductEntity> findByActive(boolean isActive);
 
     //Para usuarios
-    List<ProductEntity> findByIsActiveTrue(); // productos activos
-    List<ProductEntity> findByCategoryIdAndIsActiveTrue(Long categoryId); // productos activo de una categoria
-    List<ProductEntity> findByPriceBetweenAndIsActiveTrue(BigDecimal minPrice, BigDecimal maxPrice); // productos por precio
-    List<ProductEntity> findByNameContainingIgnoreCaseAndIsActiveTrue(String searchTerm); // productos por nombre
-    List<ProductEntity> findByStockGreaterThanAndIsActiveTrue(Integer minStock); // productos por stock
+    List<ProductEntity> findByActiveTrue(); // productos activos
+    List<ProductEntity> findByCategoryIdAndActiveTrue(Long categoryId); // productos activo de una categoria
+    List<ProductEntity> findByPriceBetweenAndActiveTrue(BigDecimal minPrice, BigDecimal maxPrice); // productos por precio
+    List<ProductEntity> findByNameContainingIgnoreCaseAndActiveTrue(String searchTerm); // productos por nombre
+    List<ProductEntity> findByStockGreaterThanAndActiveTrue(Integer minStock); // productos por stock
 }

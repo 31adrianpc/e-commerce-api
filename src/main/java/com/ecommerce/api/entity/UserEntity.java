@@ -58,15 +58,15 @@ public class UserEntity {
 
     @Builder.Default
     @Column(name = "is_active")
-    private boolean isActive = true;
+    private boolean active = true;
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private Timestamp creationTime;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Timestamp updateTime;
+    private Timestamp updatedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private CartEntity cart;

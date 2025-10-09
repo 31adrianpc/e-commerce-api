@@ -17,8 +17,8 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     Optional<CategoryEntity> findByName(String name);
 
     // Gestión de categorías
-    List<CategoryEntity> findByIsActive(boolean isActive);
+    List<CategoryEntity> findByActive(boolean active);
     
     // Para mostrar a los usuarios
-    List<CategoryEntity> findByIsActiveTrue();
+    List<CategoryEntity> findByActiveTrue();
 }

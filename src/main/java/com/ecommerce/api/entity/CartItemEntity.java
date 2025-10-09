@@ -53,10 +53,10 @@ public class CartItemEntity {
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private Timestamp creationTime;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Timestamp updateTime;
+    private Timestamp updatedAt;
 
 }

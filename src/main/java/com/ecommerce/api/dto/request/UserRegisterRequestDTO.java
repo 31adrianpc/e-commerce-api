@@ -15,26 +15,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserRegisterRequestDTO {
+
+    @NotBlank(message = "Username es obligatorio")
+    @Size(min = 3, max = 50, message = "Username debe tener entre 3 y 50 caracteres")
+    private String username;
     
     @NotBlank(message = "Email es obligatorio")
     @Email(message = "Email debe ser válido")
-    @Size(max = 100)
+    @Size(max = 100, message = "Email no debe exceder 100 caracteres")
     private String email;
 
     @NotBlank(message = "Password es obligatorio")
     @Size(min = 8, message = "Password debe tener al menos 8 caracteres")
     private String password;
 
-    @NotBlank(message = "Username es obligatorio")
-    @Size(min = 3, max = 50)
-    private String username;
-
     @NotBlank(message = "Nombre es obligatorio")
-    @Size(max = 50)
+    @Size(max = 50, message = "Nombre no debe exceder 50 caracteres")
     private String firstName;
 
     @NotBlank(message = "Apellido es obligatorio")
-    @Size(max = 50)
+    @Size(max = 50, message = "Apellido no debe exceder 50 caracteres")
     private String lastName;
 
     private USER_ROLE role;

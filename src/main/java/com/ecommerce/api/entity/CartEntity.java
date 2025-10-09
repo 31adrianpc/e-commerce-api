@@ -41,11 +41,11 @@ public class CartEntity {
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private Timestamp creationTime;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Timestamp updateTime;
+    private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CartItemEntity> items;
