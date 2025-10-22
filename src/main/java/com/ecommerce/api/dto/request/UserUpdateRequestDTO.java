@@ -29,5 +29,5 @@ public class UserUpdateRequestDTO {
 
     private USER_ROLE role; // Solo admins pueden cambiar el rol
 
-    private boolean isActive; // Solo admins pueden activar/desactivar un usuario
+    private boolean active; // Solo admins pueden activar/desactivar un usuario
 }
