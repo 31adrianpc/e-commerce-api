@@ -33,33 +33,42 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        // TODO Auto-generated method stub
-        
+        UserEntity user = findUserById(id);
+        user.setActive(false);
+        userRepository.save(user);
     }
 
     @Override
     public List<UserResponseDTO> getAllUsers() {
-        // TODO Auto-generated method stub
-        return null;
+        return userRepository
+            .findAll()
+            .stream()
+            .map(userMapper::toResponseDTO)
+            .toList();
     }
 
     @Override
     public UserResponseDTO getUserById(Long id) {
-        UserEntity user = userRepository.findById(id)
-                                        .orElseThrow(() -> new ResourceNotFoundException("No existe un usuario con dicho ID"));
+        UserEntity user = findUserById(id);
         return userMapper.toResponseDTO(user);
     }
 
     @Override
     public List<UserResponseDTO> getUsersByRole(USER_ROLE role) {
-        // TODO Auto-generated method stub
-        return null;
+        return userRepository
+            .findByRoleAndActive(role, true)
+            .stream()
+            .map(userMapper::toResponseDTO)
+            .toList();
     }
 
     @Override
     public List<UserResponseDTO> getUsersByStatus(boolean active) {
-        // TODO Auto-generated method stub
-        return null;
+        return userRepository
+            .findByActive(active)
+            .stream()
+            .map(userMapper::toResponseDTO)
+            .toList();
     }
 
     @Override
@@ -73,22 +82,8 @@ public class UserServiceImpl implements UserService {
         return "fake-jwt-token";
     }
 
-    public UserEntity findActiveUserByIdentifier(UserLoginRequestDTO request) {
-        UserEntity user;
-        if (request.getIdentifier().contains("@")){
-            user = userRepository.findByEmailAndActive(request.getIdentifier(), true)
-                                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró ningun usuario activo con dicho email"));
-        }
-        else {
-            user = userRepository.findByUsernameAndActive(request.getIdentifier(), true)
-                                 .orElseThrow(() -> new ResourceNotFoundException("No se encontrón ningun usuario activo con dicho username"));
-        }
-        return user;
-    }
-
     @Override
     public UserResponseDTO register(UserRegisterRequestDTO request) {
-
         if (userRepository.existsByUsername(request.getUsername()))
             throw new DuplicateResourceException("El username ya existe");
 
@@ -99,20 +94,55 @@ public class UserServiceImpl implements UserService {
         userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
 
         UserEntity userRegistered = userRepository.save(userEntity);
-
         return userMapper.toResponseDTO(userRegistered);
     }
 
     @Override
     public UserResponseDTO updateProfile(Long id, UserUpdateProfileRequestDTO request) {
-        // TODO Auto-generated method stub
-        return null;
+        UserEntity user = findUserById(id);
+
+        userMapper.updateProfileFromDTO(request, user);
+
+        if (request.getPassword()!=null && !request.getPassword().isBlank())
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        
+        UserEntity userSaved = userRepository.save(user);
+        return userMapper.toResponseDTO(userSaved);
     }
 
     @Override
     public UserResponseDTO updateUser(Long id, UserUpdateRequestDTO request) {
-        // TODO Auto-generated method stub
-        return null;
+        UserEntity user = findUserById(id);
+
+        if (request.getUsername()!=null &&
+            !request.getUsername().equals(user.getUsername()) &&
+            userRepository.existsByUsername(request.getUsername()))
+            throw new DuplicateResourceException("Ya existe un usuario con dicho username");
+        
+        if (request.getEmail()!=null &&
+            !request.getEmail().equals(user.getEmail()) &&
+            userRepository.existsByEmail(request.getEmail()))
+            throw new DuplicateResourceException("Ya existe un usuario con dicho email");
+        
+        userMapper.updateEntityFromDTO(request,user);
+        UserEntity userSaved = userRepository.save(user);
+        return userMapper.toResponseDTO(userSaved);
+    }
+
+    /* METODOS PRIVADOS HELPERS */
+    private UserEntity findActiveUserByIdentifier(UserLoginRequestDTO request) {
+        if (request.getIdentifier().contains("@")){
+            return userRepository.findByEmailAndActive(request.getIdentifier(), true)
+                                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró ningun usuario activo con dicho email"));
+        }
+        else {
+            return userRepository.findByUsernameAndActive(request.getIdentifier(), true)
+                                 .orElseThrow(() -> new ResourceNotFoundException("No se encontrón ningun usuario activo con dicho username"));
+        }
     }
     
+    private UserEntity findUserById(Long id) {
+        return userRepository.findById(id)
+                             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+    }
 }
