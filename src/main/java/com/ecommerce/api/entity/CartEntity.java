@@ -1,11 +1,7 @@
 package com.ecommerce.api.entity;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -18,18 +14,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "carts")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CartEntity {
+public class CartEntity extends AuditableEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,14 +33,6 @@ public class CartEntity {
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
     private UserEntity user;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private Timestamp updatedAt;
 
     @Builder.Default
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,

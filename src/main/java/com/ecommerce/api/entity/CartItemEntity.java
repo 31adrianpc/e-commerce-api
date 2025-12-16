@@ -1,12 +1,9 @@
 package com.ecommerce.api.entity;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,21 +14,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "cart_items",
        uniqueConstraints = {
             @UniqueConstraint(name = "uk_cart_product", columnNames = {"cart_id", "product_id"})
        })
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CartItemEntity {
+public class CartItemEntity extends AuditableEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,13 +49,5 @@ public class CartItemEntity {
     @Column(name = "unit_price", precision = 10, scale = 2, nullable = false)
     @DecimalMin(value = "0.0", inclusive = true, message = "El precio unitario no puede ser negativo")
     private BigDecimal unitPrice;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private Timestamp updatedAt;
 
 }

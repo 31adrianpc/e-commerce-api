@@ -1,11 +1,9 @@
 package com.ecommerce.api.entity;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
-import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,10 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "order_items",
@@ -27,11 +22,12 @@ import lombok.NoArgsConstructor;
             @UniqueConstraint(name = "uk_order_product",
                               columnNames = {"order_id", "product_id"})
        })
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderItemEntity {
+public class OrderItemEntity extends AuditableEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,9 +53,5 @@ public class OrderItemEntity {
     @Column(name = "subtotal", nullable = false, precision = 10, scale = 2)
     @DecimalMin(value = "0.0", inclusive = true, message = "El subtotal no puede ser negativo")
     private BigDecimal subtotal;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private Timestamp createdAt;
 
 }

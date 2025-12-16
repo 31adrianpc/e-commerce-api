@@ -1,13 +1,10 @@
 package com.ecommerce.api.entity;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.validation.constraints.DecimalMin;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,18 +19,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "orders")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderEntity {
+public class OrderEntity extends AuditableEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,14 +56,6 @@ public class OrderEntity {
 
     @Column(name = "notes")
     private String notes;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private Timestamp updatedAt;
 
     public enum ORDER_STATUS {
         PENDING,

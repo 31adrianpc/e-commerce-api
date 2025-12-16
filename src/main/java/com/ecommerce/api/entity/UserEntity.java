@@ -1,11 +1,7 @@
 package com.ecommerce.api.entity;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,18 +15,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserEntity {
+public class UserEntity extends AuditableEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,14 +54,6 @@ public class UserEntity {
     @Builder.Default
     @Column(name = "is_active")
     private boolean active = true;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private Timestamp updatedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,
               fetch = FetchType.LAZY, optional = false, orphanRemoval = true)

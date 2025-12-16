@@ -1,12 +1,9 @@
 package com.ecommerce.api.entity;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,18 +13,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "products")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductEntity {
+public class ProductEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,12 +54,4 @@ public class ProductEntity {
     @Builder.Default
     @Column(name = "is_active")
     private boolean active = true;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private Timestamp updatedAt;
 }
