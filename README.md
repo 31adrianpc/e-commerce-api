@@ -1,11 +1,11 @@
 
 # E-commerce API
 
-API REST para sistema de e-commerce desarrollada con Java 17 y Spring Boot 3.5.4.
+API REST para sistema de e-commerce desarrollada con Java 21 y Spring Boot 3.5.4.
 
 ## 🛠️ Tecnologías
 
-- **Java 17**
+- **Java 21**
 - **Spring Boot 3.5.4**
 - **MySQL 8.0**
 - **Spring Data JPA**
@@ -16,7 +16,7 @@ API REST para sistema de e-commerce desarrollada con Java 17 y Spring Boot 3.5.4
 
 ### Prerrequisitos
 
-- Java 17+
+- Java 21+
 - MySQL 8.0+
 - Maven 3.6+
 
