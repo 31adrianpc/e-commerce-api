@@ -1,6 +1,7 @@
 package com.ecommerce.api.entity;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -68,11 +69,14 @@ public class UserEntity {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,
+              fetch = FetchType.LAZY, optional = false, orphanRemoval = true)
     private CartEntity cart;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<OrderEntity> orders;
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
+               fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<OrderEntity> orders = new ArrayList<>();
 
     public enum USER_ROLE {
         CUSTOMER,

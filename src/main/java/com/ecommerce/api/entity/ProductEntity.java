@@ -3,6 +3,8 @@ package com.ecommerce.api.entity;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -39,10 +41,12 @@ public class ProductEntity {
     private String description;
 
     @Column(name = "price", precision = 10, scale = 2, nullable = false)
+    @DecimalMin(value = "0.0", message = "El precio debe ser mayor a 0")
     private BigDecimal price;
 
     @Builder.Default
     @Column(name = "stock_quantity", nullable = false)
+    @Min(value = 0, message = "El stock no puede ser negativo")
     private Integer stock = 0;
 
     @Column(name = "image_url", length = 500)
