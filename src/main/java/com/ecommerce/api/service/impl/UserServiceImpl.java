@@ -83,35 +83,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserResponseDTO register(UserRegisterRequestDTO request) {
-        if (userRepository.existsByUsername(request.getUsername()))
-            throw new DuplicateResourceException("El username ya existe");
-
-        if (userRepository.existsByEmail(request.getEmail()))
-            throw new DuplicateResourceException("Email ya registrado");
-
-        UserEntity userEntity = userMapper.toEntity(request);
-        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
-        userEntity.setActive(true);
-        userEntity.setRole(USER_ROLE.CUSTOMER);
-
-        return userMapper.toResponseDTO(userRepository.save(userEntity));
+        return createUserInternal(request, USER_ROLE.CUSTOMER);
     }
 
     @Transactional // evitar problemas de concurrencia
     @Override
     public UserResponseDTO createUser(UserCreateRequestDTO request) {
-        if (userRepository.existsByUsername(request.getUsername()))
-            throw new DuplicateResourceException("El username ya existe");
-
-        if (userRepository.existsByEmail(request.getEmail()))
-            throw new DuplicateResourceException("Email ya registrado");
-
-        UserEntity userEntity = userMapper.toEntity(request);
-        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
-        userEntity.setActive(true);
-        userEntity.setRole(request.getRole());
-
-        return userMapper.toResponseDTO(userRepository.save(userEntity));
+        return createUserInternal(request, request.getRole());
     }
 
     @Transactional
@@ -163,5 +141,23 @@ public class UserServiceImpl implements UserService {
     private UserEntity findUserById(Long id) {
         return userRepository.findById(id)
                              .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+    }
+
+    private UserResponseDTO createUserInternal(UserBaseDTO request, USER_ROLE role) {
+        if (userRepository.existsByUsername(request.getUsername()))
+            throw new DuplicateResourceException("El username ya existe");
+
+        if (userRepository.existsByEmail(request.getEmail()))
+            throw new DuplicateResourceException("Email ya registrado");
+
+        UserEntity userEntity = request instanceof UserRegisterRequestDTO
+                ? userMapper.toEntity((UserRegisterRequestDTO) request)
+                : userMapper.toEntity((UserCreateRequestDTO) request);
+
+        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+        userEntity.setActive(true);
+        userEntity.setRole(role);
+
+        return userMapper.toResponseDTO(userRepository.save(userEntity));
     }
 }
