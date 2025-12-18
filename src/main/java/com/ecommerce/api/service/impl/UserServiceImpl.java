@@ -2,14 +2,11 @@ package com.ecommerce.api.service.impl;
 
 import java.util.List;
 
+import com.ecommerce.api.dto.request.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.ecommerce.api.dto.request.UserLoginRequestDTO;
-import com.ecommerce.api.dto.request.UserRegisterRequestDTO;
-import com.ecommerce.api.dto.request.UserUpdateProfileRequestDTO;
-import com.ecommerce.api.dto.request.UserUpdateRequestDTO;
 import com.ecommerce.api.dto.response.UserResponseDTO;
 import com.ecommerce.api.entity.UserEntity;
 import com.ecommerce.api.entity.UserEntity.USER_ROLE;
@@ -20,6 +17,7 @@ import com.ecommerce.api.repository.UserRepository;
 import com.ecommerce.api.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +29,7 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional // mantener sincronización entre BD y contexto de persistencia
     @Override
     public void deleteUser(Long id) {
         UserEntity user = findUserById(id);
@@ -72,7 +71,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    
     public String login(UserLoginRequestDTO request) {
         UserEntity user = findActiveUserByIdentifier(request);
 
@@ -82,6 +80,7 @@ public class UserServiceImpl implements UserService {
         return "fake-jwt-token";
     }
 
+    @Transactional
     @Override
     public UserResponseDTO register(UserRegisterRequestDTO request) {
         if (userRepository.existsByUsername(request.getUsername()))
@@ -92,11 +91,30 @@ public class UserServiceImpl implements UserService {
 
         UserEntity userEntity = userMapper.toEntity(request);
         userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+        userEntity.setActive(true);
+        userEntity.setRole(USER_ROLE.CUSTOMER);
 
-        UserEntity userRegistered = userRepository.save(userEntity);
-        return userMapper.toResponseDTO(userRegistered);
+        return userMapper.toResponseDTO(userRepository.save(userEntity));
     }
 
+    @Transactional // evitar problemas de concurrencia
+    @Override
+    public UserResponseDTO createUser(UserCreateRequestDTO request) {
+        if (userRepository.existsByUsername(request.getUsername()))
+            throw new DuplicateResourceException("El username ya existe");
+
+        if (userRepository.existsByEmail(request.getEmail()))
+            throw new DuplicateResourceException("Email ya registrado");
+
+        UserEntity userEntity = userMapper.toEntity(request);
+        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+        userEntity.setActive(true);
+        userEntity.setRole(request.getRole());
+
+        return userMapper.toResponseDTO(userRepository.save(userEntity));
+    }
+
+    @Transactional
     @Override
     public UserResponseDTO updateProfile(Long id, UserUpdateProfileRequestDTO request) {
         UserEntity user = findUserById(id);
@@ -110,6 +128,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toResponseDTO(userSaved);
     }
 
+    @Transactional
     @Override
     public UserResponseDTO updateUser(Long id, UserUpdateRequestDTO request) {
         UserEntity user = findUserById(id);
@@ -137,7 +156,7 @@ public class UserServiceImpl implements UserService {
         }
         else {
             return userRepository.findByUsernameAndActive(request.getIdentifier(), true)
-                                 .orElseThrow(() -> new ResourceNotFoundException("No se encontrón ningun usuario activo con dicho username"));
+                                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró ningun usuario activo con dicho username"));
         }
     }
     

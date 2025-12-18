@@ -1,5 +1,6 @@
 package com.ecommerce.api.mapper;
 
+import com.ecommerce.api.dto.request.UserCreateRequestDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -25,7 +26,16 @@ public interface UserMapper {
     @Mapping(target = "cart", ignore = true)
     @Mapping(target = "orders", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "role", ignore = true)
     UserEntity toEntity(UserRegisterRequestDTO dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "cart", ignore = true)
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    UserEntity toEntity(UserCreateRequestDTO dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "username", ignore = true)
