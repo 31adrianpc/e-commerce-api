@@ -21,8 +21,6 @@ public interface UserMapper {
     UserResponseDTO toResponseDTO(UserEntity entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "cart", ignore = true)
     @Mapping(target = "orders", ignore = true)
     @Mapping(target = "active", ignore = true)
@@ -30,8 +28,6 @@ public interface UserMapper {
     UserEntity toEntity(UserRegisterRequestDTO dto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "cart", ignore = true)
     @Mapping(target = "orders", ignore = true)
     @Mapping(target = "active", ignore = true)
@@ -41,8 +37,6 @@ public interface UserMapper {
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "role", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "cart", ignore = true)
     @Mapping(target = "orders", ignore = true)
     @Mapping(target = "active", ignore = true)
@@ -50,8 +44,6 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "cart", ignore = true)
     @Mapping(target = "orders", ignore = true)
     void updateEntityFromDTO(UserUpdateRequestDTO dto, @MappingTarget UserEntity entity);

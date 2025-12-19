@@ -1,6 +1,6 @@
 package com.ecommerce.api.dto.response;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import com.ecommerce.api.entity.UserEntity.USER_ROLE;
 
@@ -22,6 +22,6 @@ public class UserResponseDTO {
     private String lastName;
     private USER_ROLE role;
     private boolean active;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
