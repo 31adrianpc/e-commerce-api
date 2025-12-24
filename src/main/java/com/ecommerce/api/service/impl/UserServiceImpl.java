@@ -70,16 +70,6 @@ public class UserServiceImpl implements UserService {
             .toList();
     }
 
-    @Override
-    public String login(UserLoginRequestDTO request) {
-        UserEntity user = findActiveUserByIdentifier(request);
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
-            throw new BadCredentialsException("Contraseña incorrecta");
-
-        return "fake-jwt-token";
-    }
-
     @Transactional
     @Override
     public UserResponseDTO register(UserRegisterRequestDTO request) {
@@ -127,17 +117,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /* METODOS PRIVADOS HELPERS */
-    private UserEntity findActiveUserByIdentifier(UserLoginRequestDTO request) {
-        if (request.getIdentifier().contains("@")){
-            return userRepository.findByEmailAndActive(request.getIdentifier(), true)
-                                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró ningun usuario activo con dicho email"));
-        }
-        else {
-            return userRepository.findByUsernameAndActive(request.getIdentifier(), true)
-                                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró ningun usuario activo con dicho username"));
-        }
-    }
-    
     private UserEntity findUserById(Long id) {
         return userRepository.findById(id)
                              .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));

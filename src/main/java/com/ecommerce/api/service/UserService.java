@@ -9,7 +9,6 @@ import com.ecommerce.api.entity.UserEntity.USER_ROLE;
 public interface UserService {
 
     UserResponseDTO register(UserRegisterRequestDTO request);
-    String login(UserLoginRequestDTO request); // retorna un JWT
     UserResponseDTO createUser(UserCreateRequestDTO request);
 
     UserResponseDTO getUserById(Long id);
