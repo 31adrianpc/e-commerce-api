@@ -45,6 +45,18 @@ API REST para sistema de e-commerce desarrollada con Java 21 y Spring Boot 3.5.4
    mvn spring-boot:run
    ```
 
+## 🧪 Pruebas de Endpoints
+
+Este proyecto incluye archivos de prueba para el **HTTP Client de IntelliJ IDEA**.
+
+1. Ubica la carpeta `http-client/` en la raíz.
+2. Asegúrate de seleccionar el entorno `dev` en la barra superior del editor.
+3. Ejecuta las peticiones directamente desde el IDE.
+
+**Flujo recomendado:**
+1. Ejecutar `auth.http` para obtener el token JWT (se guarda automáticamente).
+2. Ejecutar el resto de archivos (`users.http`, etc.) que usarán dicho token.
+
 ## 📁 Estado Actual del Proyecto
 
 ### ✅ Completado
@@ -53,11 +65,11 @@ API REST para sistema de e-commerce desarrollada con Java 21 y Spring Boot 3.5.4
 - ✅ Entidades con relaciones JPA
 - ✅ Configuración de MySQL y JPA
 - ✅ Repositories con Spring Data JPA
+- ✅ Seguridad JWT
 
 ### 🚧 En Desarrollo
 - 🚧 Services con lógica de negocio
 - 🚧 REST Controllers
-- 🚧 Seguridad JWT
 - 🚧 DTOs y validaciones
 
 ## 🗄️ Modelo de Base de Datos
