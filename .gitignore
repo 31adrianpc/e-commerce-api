@@ -2,6 +2,7 @@ HELP.md
 application.properties
 application-*.properties
 .env
+http-client.private.env.json
 *.log
 target/
 .mvn/wrapper/maven-wrapper.jar
