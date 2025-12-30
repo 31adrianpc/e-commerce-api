@@ -1,0 +1,12 @@
+### Login
+POST http://{{host}}/api/{{version}}/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "{{admin_email}}",
+  "password": "{{admin_pass}}"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token)
+%}
