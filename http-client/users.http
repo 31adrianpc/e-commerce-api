@@ -1,3 +1,16 @@
 ### Listar usuarios
 GET http://{{host}}/api/{{version}}/users
 Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Lista no vacía", function () {
+        client.assert(response.body.length>0, "No hay usuarios para probar")
+    });
+
+    client.global.set("user_id", response.body[0].id)
+
+%}
+
+### Obtener por ID
+GET http://{{host}}/api/{{version}}/users/{{user_id}}
+Authorization: Bearer {{auth_token}}
