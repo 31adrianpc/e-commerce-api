@@ -3,12 +3,15 @@ GET http://{{host}}/api/{{version}}/users
 Authorization: Bearer {{auth_token}}
 
 > {%
-    client.test("Lista no vacía", function () {
-        client.assert(response.body.length>0, "No hay usuarios para probar")
-    });
+    client.test("Petición exitosa y datos obtenidos", function () {
+        client.assert(response.status===200, "Status obtenido: " + response.status);
+        client.assert(response.body && response.body.length>0, "Petición exitosa, pero lista vacía");
+    })
 
-    client.global.set("user_id", response.body[0].id)
-
+    if (response.status===200 && response.body.length>0) {
+        client.global.set("user_id", response.body[0].id);
+        client.log("Petición exitosa, ID obtenido: " + response.body[0].id);
+    }
 %}
 
 ### Obtener por ID
