@@ -24,3 +24,13 @@ Authorization: Bearer {{auth_token}}
         client.assert(response.body.id===client.global.get("user_id"), "El id no coincide con el recibido")
     })
 %}
+
+### Eliminar por ID
+DELETE http://{{host}}/api/{{version}}/users/{{user_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.test("Petición exitosa", function () {
+        client.assert(response.status===204, "Status obtenido: " + response.status);
+    })
+%}
