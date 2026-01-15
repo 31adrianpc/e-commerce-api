@@ -115,4 +115,84 @@ public class UserControllerTest {
 
         verify(userService, never()).getAllUsers();
     }
+
+    /* GET BY ID */
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getById_AsAdmin_ShouldReturnUser() throws Exception {
+        Long userId = 1L;
+
+        UserResponseDTO user = UserResponseDTO.builder()
+                .id(userId)
+                .username("admin")
+                .email("admin@example.com")
+                .role(USER_ROLE.ADMIN)
+                .active(true)
+                .build();
+
+        when(userService.getUserById(userId)).thenReturn(user);
+
+        mockMvc.perform(get("/api/v1/users/{id}", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId));
+
+        verify(userService).getUserById(userId);
+    }
+
+    @Test
+    @WithMockCustomUser(id = 1, roles = {"CUSTOMER"})
+    void getById_AsCustomer_WithDifferentId_ShouldReturnForbidden() throws Exception{
+        Long userId = 2L;
+
+        mockMvc.perform(get("/api/v1/users/{id}", userId))
+                .andExpect(status().isForbidden());
+
+        verify(userService, never()).getUserById(any());
+    }
+
+    @Test
+    @WithMockCustomUser(id = 1, username = "customer", roles = {"CUSTOMER"})
+    void getById_AsCustomer_WithSameId_ShouldReturnUser() throws Exception{
+        Long userId = 1L;
+
+        UserResponseDTO user = UserResponseDTO.builder()
+                .id(userId)
+                .username("customer")
+                .email("customer@example.com")
+                .role(USER_ROLE.CUSTOMER)
+                .active(true)
+                .build();
+
+        when(userService.getUserById(userId)).thenReturn(user);
+
+        mockMvc.perform(get("/api/v1/users/{id}", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.username").value("customer"));
+
+        verify(userService).getUserById(userId);
+    }
+
+    @Test
+    void getById_WithoutAuth_ShouldReturnUnauthorized() throws Exception {
+        Long userId = 1L;
+
+        mockMvc.perform(get("/api/v1/users/{id}", userId))
+                .andExpect(status().isUnauthorized());
+
+        verify(userService, never()).getUserById(userId);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getById_WithNonExistentId_ShouldReturnNotFound() throws Exception {
+        Long userId = 999L;
+
+        when(userService.getUserById(userId)).thenThrow(new ResourceNotFoundException("User not found"));
+
+        mockMvc.perform(get("/api/v1/users/{id}", userId))
+                .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).getUserById(userId);
+    }
 }
