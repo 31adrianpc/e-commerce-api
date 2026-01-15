@@ -1,7 +1,9 @@
 package com.ecommerce.api.controller;
 
 import com.ecommerce.api.config.SecurityConfig;
+import com.ecommerce.api.config.WithMockCustomUser;
 import com.ecommerce.api.dto.response.UserResponseDTO;
+import com.ecommerce.api.exception.ResourceNotFoundException;
 import com.ecommerce.api.security.CustomUserDetailsService;
 import com.ecommerce.api.security.JwtAuthenticationFilter;
 import com.ecommerce.api.service.JwtService;
@@ -28,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 import java.util.List;
 
-@WebMvcTest(controllers = UserController.class)
-@Import(SecurityConfig.class)
+@WebMvcTest(controllers = UserController.class) // Queremos probar UserController
+@Import(SecurityConfig.class) // Importamos nuestra clase SecurityConfig del main
 public class UserControllerTest {
 
     @Autowired
@@ -56,13 +58,14 @@ public class UserControllerTest {
             HttpServletRequest request = invocation.getArgument(0);
             HttpServletResponse response = invocation.getArgument(1);
             FilterChain chain = invocation.getArgument(2);
-            chain.doFilter(request, response);
+            chain.doFilter(request, response); // No hacemos nada, simplemente pasamos al siguiente filtro
             return null;
-        }).when(jwtAuthenticationFilter).doFilter(any(), any(), any());
+        }).when(jwtAuthenticationFilter).doFilter(any(), any(), any()); // para cualquier request, response y chain
     }
 
+    /* LIST ALL */
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(roles = "ADMIN") // Utilizamos dicha anotación para inyectar directamente un authentication al securityContext
     void listAll_AsAdmin_ShouldReturnAllUsers() throws Exception{
 
         List<UserResponseDTO> users = List.of(
@@ -84,38 +87,32 @@ public class UserControllerTest {
 
         when(userService.getAllUsers()).thenReturn(users);
 
-        var result = mockMvc.perform(get("/api/v1/users"))
+        mockMvc.perform(get("/api/v1/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].username").value("admin"))
-                .andExpect(jsonPath("$[1].username").value("customer"))
-                .andReturn();
+                .andExpect(jsonPath("$[1].username").value("customer"));
 
-        System.out.println("Status: " + result.getResponse().getStatus());
-        verify(userService, times(1)).getAllUsers();
+        verify(userService).getAllUsers();
     }
 
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void listAll_AsCustomer_ShouldReturnForbidden() throws Exception{
 
-        var result = mockMvc.perform(get("/api/v1/users"))
-                .andExpect(status().isForbidden())
-                .andReturn();
+        mockMvc.perform(get("/api/v1/users"))
+                .andExpect(status().isForbidden());
 
-        System.out.println("Status: " + result.getResponse().getStatus());
         verify(userService, never()).getAllUsers();
     }
 
     @Test
     void listAll_WithoutAuth_ShouldReturnUnauthorized() throws Exception {
 
-        var result = mockMvc.perform(get("/api/v1/users"))
-                .andExpect(status().isUnauthorized())
-                .andReturn();
+        mockMvc.perform(get("/api/v1/users"))
+                .andExpect(status().isUnauthorized());
 
-        System.out.println("Status: " + result.getResponse().getStatus());
         verify(userService, never()).getAllUsers();
     }
 }
