@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.ecommerce.api.entity.UserEntity.USER_ROLE;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -63,7 +64,7 @@ public class UserControllerTest {
         }).when(jwtAuthenticationFilter).doFilter(any(), any(), any()); // para cualquier request, response y chain
     }
 
-    /* LIST ALL */
+    /* ------ LIST ALL ------ */
     @Test
     @WithMockUser(roles = "ADMIN") // Utilizamos dicha anotación para inyectar directamente un authentication al securityContext
     void listAll_AsAdmin_ShouldReturnAllUsers() throws Exception{
@@ -116,7 +117,7 @@ public class UserControllerTest {
         verify(userService, never()).getAllUsers();
     }
 
-    /* GET BY ID */
+    /* ------ GET BY ID ------ */
     @Test
     @WithMockUser(roles = "ADMIN")
     void getById_AsAdmin_ShouldReturnUser() throws Exception {
@@ -193,6 +194,63 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/v1/users/{id}", userId))
                 .andExpect(status().isNotFound());
 
-        verify(userService, times(1)).getUserById(userId);
+        verify(userService).getUserById(userId);
+    }
+
+    /* ------ DELETE BY ID ------ */
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deleteById_AsAdmin_ShouldReturnNoContent() throws Exception {
+        Long userId = 1L;
+
+        mockMvc.perform(delete("/api/v1/users/{id}", userId))
+                .andExpect(status().isNoContent());
+
+        verify(userService).deleteUser(userId);
+    }
+
+    @Test
+    @WithMockCustomUser(id = 1, roles = {"CUSTOMER"})
+    void deleteById_AsCustomer_WithDifferentId_ShouldReturnForbidden() throws Exception{
+        Long userId = 2L;
+
+        mockMvc.perform(delete("/api/v1/users/{id}", userId))
+                .andExpect(status().isForbidden());
+
+        verify(userService, never()).deleteUser(any());
+    }
+
+    @Test
+    @WithMockCustomUser(id = 1, roles = {"CUSTOMER"})
+    void deleteById_AsCustomer_WithSameId_ShouldReturnNoContent() throws Exception{
+        Long userId = 1L;
+
+        mockMvc.perform(delete("/api/v1/users/{id}", userId))
+                .andExpect(status().isNoContent());
+
+        verify(userService).deleteUser(userId);
+    }
+
+    @Test
+    void deleteById_WithoutAuth_ShouldReturnUnauthorized() throws Exception {
+        Long userId = 1L;
+
+        mockMvc.perform(delete("/api/v1/users/{id}", userId))
+                .andExpect(status().isUnauthorized());
+
+        verify(userService, never()).deleteUser(any());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deleteById_WithNonExistentId_ShouldReturnNotFound() throws Exception {
+        Long userId = 999L;
+
+        doThrow(new ResourceNotFoundException("User not found")).when(userService).deleteUser(userId);
+
+        mockMvc.perform(delete("/api/v1/users/{id}", userId))
+                .andExpect(status().isNotFound());
+
+        verify(userService).deleteUser(userId);
     }
 }
