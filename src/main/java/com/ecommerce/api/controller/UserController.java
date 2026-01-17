@@ -3,7 +3,9 @@ package com.ecommerce.api.controller;
 import com.ecommerce.api.dto.request.*;
 import com.ecommerce.api.dto.response.UserResponseDTO;
 import com.ecommerce.api.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +36,11 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> deleteById(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreateRequestDTO user) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
     }
 }
