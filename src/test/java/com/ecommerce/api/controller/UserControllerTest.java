@@ -2,12 +2,14 @@ package com.ecommerce.api.controller;
 
 import com.ecommerce.api.config.SecurityConfig;
 import com.ecommerce.api.config.WithMockCustomUser;
+import com.ecommerce.api.dto.request.UserCreateRequestDTO;
 import com.ecommerce.api.dto.response.UserResponseDTO;
 import com.ecommerce.api.exception.ResourceNotFoundException;
 import com.ecommerce.api.security.CustomUserDetailsService;
 import com.ecommerce.api.security.JwtAuthenticationFilter;
 import com.ecommerce.api.service.JwtService;
 import com.ecommerce.api.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,8 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.ecommerce.api.entity.UserEntity.USER_ROLE;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.IOException;
@@ -49,6 +50,8 @@ public class UserControllerTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() throws ServletException, IOException {
@@ -252,5 +255,97 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(userService).deleteUser(userId);
+    }
+
+    /* ------ CREATE USER (ADMIN) ------ */
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void createUser_AsAdmin_ShouldReturnCreated() throws Exception {
+        String username = "customer";
+        String email = "customer@example.com";
+
+        UserCreateRequestDTO request = UserCreateRequestDTO.builder()
+                .username(username)
+                .email(email)
+                .password("customer123")
+                .firstName("customerFN")
+                .lastName("customerLN")
+                .role(USER_ROLE.CUSTOMER)
+                .build();
+
+        UserResponseDTO user = UserResponseDTO.builder()
+                .id(1L)
+                .username(username)
+                .email(email)
+                .role(USER_ROLE.CUSTOMER)
+                .active(true)
+                .build();
+
+        when(userService.createUser(request)).thenReturn(user);
+
+        mockMvc.perform(post("/api/v1/users")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.username").value(username))
+                .andExpect(jsonPath("$.email").value(email));
+
+        verify(userService).createUser(request);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void createUser_AsAdmin_IncorrectBody_ShouldReturnBadRequest() throws Exception {
+
+        UserCreateRequestDTO request = UserCreateRequestDTO.builder()
+                .username("cr") // corto (<3)
+                .email("customerexample.com") // falta @
+                .password("custome") // corto (<8)
+                .firstName("customerFN")
+                .lastName("customerLN")
+                .role(null) // nulo
+                .build();
+
+        mockMvc.perform(post("/api/v1/users")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation field"))
+                .andExpect(jsonPath("$.errors.username").exists())
+                .andExpect(jsonPath("$.errors.email").exists())
+                .andExpect(jsonPath("$.errors.password").exists())
+                .andExpect(jsonPath("$.errors.role").exists());
+
+        verify(userService, never()).createUser(request);
+    }
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    void createUser_AsCustomer_ShouldReturnForbidden() throws Exception {
+        UserCreateRequestDTO request = UserCreateRequestDTO.builder()
+                .username("customer")
+                .email("customer@example.com")
+                .password("customer123")
+                .firstName("customerFN")
+                .lastName("customerLN")
+                .role(USER_ROLE.CUSTOMER)
+                .build();
+
+        mockMvc.perform(post("/api/v1/users")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request))
+                       )
+                .andExpect(status().isForbidden());
+
+        verify(userService, never()).createUser(any());
+    }
+
+    @Test
+    void createUser_WithoutAuth_ShouldReturnUnauthorized() throws Exception {
+        mockMvc.perform(post("/api/v1/users"))
+                .andExpect(status().isUnauthorized());
+
+        verify(userService, never()).createUser(any());
     }
 }
