@@ -21,7 +21,7 @@ Authorization: Bearer {{auth_token}}
 > {%
     client.test("Petición exitosa", function () {
         client.assert(response.status===200, "Status obtenido: " + response.status);
-        client.assert(response.body.id===client.global.get("user_id"), "El id no coincide con el recibido")
+        client.assert(response.body.id===client.global.get("user_id"), "El id no coincide con el recibido");
     })
 %}
 
@@ -32,5 +32,26 @@ Authorization: Bearer {{auth_token}}
 > {%
     client.test("Petición exitosa", function () {
         client.assert(response.status===204, "Status obtenido: " + response.status);
+    })
+%}
+
+### Crear usuario (ADMIN)
+POST http://{{host}}/api/{{version}}/users
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "username": "RafaelC",
+  "email": "rcastillo@example.com",
+  "password": "rafatillo123",
+  "firstName": "Rafael",
+  "lastName": "Castillo",
+  "role": "ADMIN"
+}
+
+> {%
+    client.test("Petición exitosa", function () {
+        client.assert(response.status===201, "Status obtenido: " + response.status);
+        client.assert(response.body.id != null);
     })
 %}
