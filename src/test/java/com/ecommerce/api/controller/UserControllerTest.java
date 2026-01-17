@@ -3,6 +3,7 @@ package com.ecommerce.api.controller;
 import com.ecommerce.api.config.SecurityConfig;
 import com.ecommerce.api.config.WithMockCustomUser;
 import com.ecommerce.api.dto.request.UserCreateRequestDTO;
+import com.ecommerce.api.dto.request.UserRegisterRequestDTO;
 import com.ecommerce.api.dto.response.UserResponseDTO;
 import com.ecommerce.api.exception.ResourceNotFoundException;
 import com.ecommerce.api.security.CustomUserDetailsService;
@@ -348,4 +349,64 @@ public class UserControllerTest {
 
         verify(userService, never()).createUser(any());
     }
+
+    /* ------ REGISTER USER ------ */
+    @Test
+    void registerUser_ShouldReturnCreated() throws Exception {
+        String username = "customer";
+        String email = "customer@example.com";
+
+        UserRegisterRequestDTO request = UserRegisterRequestDTO.builder()
+                .username(username)
+                .email(email)
+                .password("customer123")
+                .firstName("customerFN")
+                .lastName("customerLN")
+                .build();
+
+        UserResponseDTO user = UserResponseDTO.builder()
+                .id(1L)
+                .username(username)
+                .email(email)
+                .role(USER_ROLE.CUSTOMER)
+                .active(true)
+                .build();
+
+        when(userService.register(request)).thenReturn(user);
+
+        mockMvc.perform(post("/api/v1/users/register")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.username").value(username))
+                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.role").value(USER_ROLE.CUSTOMER.toString()));
+
+        verify(userService).register(request);
+    }
+
+    @Test
+    void registerUser_IncorrectBody_ShouldReturnBadRequest() throws Exception {
+
+        UserRegisterRequestDTO request = UserRegisterRequestDTO.builder()
+                .username("cr") // corto (<3)
+                .email("customerexample.com") // falta @
+                .password("custome") // corto (<8)
+                .firstName("customerFN")
+                .lastName("customerLN")
+                .build();
+
+        mockMvc.perform(post("/api/v1/users/register")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation field"))
+                .andExpect(jsonPath("$.errors.username").exists())
+                .andExpect(jsonPath("$.errors.email").exists())
+                .andExpect(jsonPath("$.errors.password").exists());
+
+        verify(userService, never()).register(request);
+    }
+
 }
