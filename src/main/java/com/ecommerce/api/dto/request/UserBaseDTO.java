@@ -3,9 +3,15 @@ package com.ecommerce.api.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserBaseDTO {
     @NotBlank(message = "Username es obligatorio")
     @Size(min = 3, max = 50, message = "Username debe tener entre 3 y 50 caracteres")
