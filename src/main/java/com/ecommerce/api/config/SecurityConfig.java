@@ -52,7 +52,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Innecesario dado que no manejamos sesiones de servidor
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No creamos sesiones, por definición, REST es stateless
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**",
+                                         "/api/v1/users/register")
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
