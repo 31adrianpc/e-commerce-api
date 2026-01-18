@@ -48,4 +48,10 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> registerUser(@Valid @RequestBody UserRegisterRequestDTO user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(user));
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequestDTO user) {
+        return ResponseEntity.ok(userService.updateUser(id, user));
+    }
 }
