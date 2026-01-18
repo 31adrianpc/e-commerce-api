@@ -55,3 +55,23 @@ Content-Type: application/json
         client.assert(response.body.id != null);
     })
 %}
+
+### Registrar usuario
+POST http://{{host}}/api/{{version}}/users/register
+Content-Type: application/json
+
+{
+  "username": "PedroG",
+  "email": "pgonzales@example.com",
+  "password": "pedrales123",
+  "firstName": "Pedro",
+  "lastName": "Gonzales"
+}
+
+> {%
+    client.test("Petición exitosa", function () {
+        client.assert(response.status===201, "Status obtenido: " + response.status);
+        client.assert(response.body.id != null);
+        client.assert(response.body.role === "CUSTOMER");
+    })
+%}
