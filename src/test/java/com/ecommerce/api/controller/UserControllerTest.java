@@ -4,6 +4,7 @@ import com.ecommerce.api.config.SecurityConfig;
 import com.ecommerce.api.config.WithMockCustomUser;
 import com.ecommerce.api.dto.request.UserCreateRequestDTO;
 import com.ecommerce.api.dto.request.UserRegisterRequestDTO;
+import com.ecommerce.api.dto.request.UserUpdateRequestDTO;
 import com.ecommerce.api.dto.response.UserResponseDTO;
 import com.ecommerce.api.exception.ResourceNotFoundException;
 import com.ecommerce.api.security.CustomUserDetailsService;
@@ -409,4 +410,107 @@ public class UserControllerTest {
         verify(userService, never()).register(request);
     }
 
+    /* ------ UPDATE USER ------ */
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateUser_AsAdmin_ShouldReturnUpdatedUser() throws Exception {
+        Long userId = 1L;
+        String username = "customerusername", email = "customer@example.com";
+
+        UserUpdateRequestDTO request = UserUpdateRequestDTO.builder()
+                .username(username)
+                .email(email)
+                .build();
+
+        UserResponseDTO response = UserResponseDTO.builder()
+                .id(userId)
+                .username(username)
+                .email(email)
+                .build();
+
+        when(userService.updateUser(userId, request)).thenReturn(response);
+
+        mockMvc.perform(put("/api/v1/users/{id}",userId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.username").value(username));
+
+        verify(userService).updateUser(userId, request);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateUser_AsAdmin_IncorrectBody_ShouldReturnBadRequest() throws Exception {
+        Long userId = 1L;
+        String username = "cr", email = "customerexample.com";
+
+        UserUpdateRequestDTO request = UserUpdateRequestDTO.builder()
+                .username(username)
+                .email(email)
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/{id}",userId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        verify(userService, never()).updateUser(userId, request);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateUser_AsAdmin_WithNonExistentID_ShouldReturnNotFound() throws Exception {
+        Long userId = 999L;
+
+        UserUpdateRequestDTO request = UserUpdateRequestDTO.builder()
+                .username("customerusername")
+                .email("customer@example.com")
+                .build();
+
+        doThrow(new ResourceNotFoundException("User not found")).when(userService).updateUser(userId, request);
+
+        mockMvc.perform(put("/api/v1/users/{id}",userId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+
+        verify(userService).updateUser(userId, request);
+    }
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    void updateUser_AsCustomer_ShouldReturnForbidden() throws Exception {
+        Long userId = 1L;
+
+        UserUpdateRequestDTO request = UserUpdateRequestDTO.builder()
+                .username("customerusername")
+                .email("customer@example.com")
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/{id}",userId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+
+        verify(userService, never()).updateUser(userId, request);
+    }
+
+    @Test
+    void updateUser_WithoutAuth_ShouldReturnUnauthorized() throws Exception {
+        Long userId = 1L;
+
+        UserUpdateRequestDTO request = UserUpdateRequestDTO.builder()
+                .username("customerusername")
+                .email("customer@example.com")
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/{id}",userId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+
+        verify(userService, never()).updateUser(userId, request);
+    }
 }
